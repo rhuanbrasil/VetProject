@@ -56,14 +56,25 @@ public class Pets {
     }
     public Pet findByCriters(String arg, String arg2){
         return pets.stream()
-                .filter(pet ->
-                        pet.getAddress().equals(arg) || pet.getAddress().equals(arg2) ||
-                        pet.getName().contains(arg2) || pet.getName().contains(arg) ||
-                        pet.getAge() == Integer.parseInt(arg2) || pet.getAge() == Integer.parseInt(arg) ||
-                        pet.getWeight() == Double.parseDouble(arg2) || pet.getWeight() == Double.parseDouble(arg) ||
-                        pet.getRace().equals(arg2) || pet.getRace().equals(arg) ||
-                        pet.getSex().name().equals(arg2.toUpperCase().trim()) || pet.getSex().name().equals(arg.toUpperCase().trim())
-                )                .findFirst()
+                .filter(pet -> {
+                    boolean matchesArg =
+                            pet.getAddress().equals(arg) ||
+                            pet.getName().contains(arg) ||
+                            pet.getAge() == Integer.parseInt(arg) ||
+                            pet.getWeight() == Double.parseDouble(arg) ||
+                            pet.getRace().equals(arg) ||
+                            pet.getSex().name().equals(arg.toUpperCase().trim());
+                    boolean matchesArg2 =
+                            pet.getAddress().equals(arg2) ||
+                            pet.getName().contains(arg2) ||
+                            pet.getAge() == Integer.parseInt(arg2) ||
+                            pet.getWeight() == Double.parseDouble(arg2) ||
+                            pet.getRace().equals(arg2);
+
+                    return matchesArg && matchesArg2;
+
+                })
+                .findFirst()
                 .orElseThrow(() -> new MenuExceptions("Por favor, informe critérios presentes em algum pet cadastrado"));
 
     }

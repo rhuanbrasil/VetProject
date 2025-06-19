@@ -8,9 +8,12 @@ import enums.Sex;
 import enums.Type;
 import utils.RegisterInfos;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Program {
@@ -40,6 +43,7 @@ public class Program {
                     case REGISTER -> {
                        var pet = Pets.RegisterPet();
                         pets.addpet(pet);
+                        createDoc(pet);
                     }
                     case UPDATE ->{
                         var pet = wichPet(pets);
@@ -52,6 +56,16 @@ public class Program {
                     case LISTALL -> {
                         pets.listAll();
                     }
+                    case FILTERLIST -> {
+                        var qnt = qntCriters();
+                        if (qnt == 1){
+                            System.out.println(pets.findByCriter(arg()));
+                        } else {
+                            var a1 = arg();
+                            var a2 = arg();
+                            System.out.println(pets.findByCriters(a1, a2));
+                        }
+                    }
                     case EXIT -> {
                         System.out.println("Saindo...");
                         exit = true;
@@ -61,6 +75,44 @@ public class Program {
             } catch (MenuExceptions e) {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+    public static String arg(){
+        var sc = new Scanner(System.in);
+        System.out.println("Digite o nome ou alguma característica do seu pet:");
+        return sc.nextLine();
+    }
+    public static int qntCriters() {
+
+            try {
+                var sc = new Scanner(System.in);
+                System.out.println("Quantos critérios você vai usar? (1/2)");
+                var crit = sc.nextInt();
+                if (crit < 1 || crit > 2) {
+                    throw new MenuExceptions("Favor, informe um válor válido");
+                } else{
+                return crit;
+                }
+            } catch (MenuExceptions e) {
+                System.out.println(e.getMessage());
+            }
+            return 0;
+    }
+    public static void createDoc(Pet pet){
+        var now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+        var formattedDateTime = now.format(formatter);
+        var path = formattedDateTime + "-" + pet.getName().replaceAll(" ", "").toUpperCase();
+        try(BufferedWriter br = new BufferedWriter(new FileWriter(path + ".txt"))){
+            br.write("1." + pet.getName() +"\n");
+            br.write("2." + pet.getType() +"\n");
+            br.write("3." + pet.getSex() +"\n");
+            br.write("4." + pet.getAddress() +"\n");
+            br.write("5." + pet.getAge() +"\n");
+            br.write("6." + pet.getWeight() +"\n");
+            br.write("7." + pet.getRace() +"\n");
+        }catch (IOException e){
+            System.out.println(e.getMessage());
         }
     }
     public static Pet wichDelete(Pets pets) {
