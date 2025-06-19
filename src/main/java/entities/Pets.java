@@ -59,16 +59,16 @@ public class Pets {
                 .filter(pet -> {
                     boolean matchesArg =
                             pet.getAddress().equals(arg) ||
-                            pet.getName().contains(arg) ||
-                            pet.getAge() == Integer.parseInt(arg) ||
-                            pet.getWeight() == Double.parseDouble(arg) ||
-                            pet.getRace().equals(arg) ||
+                            pet.getName().toLowerCase().contains(arg.toLowerCase()) ||
+                            (isValidInt(arg) && pet.getAge() == Integer.parseInt(arg)) ||
+                            (isValidDouble(arg) && pet.getWeight() == Double.parseDouble(arg)) ||
+                            pet.getRace().equalsIgnoreCase(arg) ||
                             pet.getSex().name().equals(arg.toUpperCase().trim());
                     boolean matchesArg2 =
                             pet.getAddress().equals(arg2) ||
                             pet.getName().contains(arg2) ||
-                            pet.getAge() == Integer.parseInt(arg2) ||
-                            pet.getWeight() == Double.parseDouble(arg2) ||
+                            (isValidInt(arg2) && pet.getAge() == Integer.parseInt(arg2)) ||
+                            (isValidDouble(arg2) && pet.getWeight() == Double.parseDouble(arg2)) ||
                             pet.getRace().equals(arg2);
 
                     return matchesArg && matchesArg2;
@@ -78,12 +78,36 @@ public class Pets {
                 .orElseThrow(() -> new MenuExceptions("Por favor, informe critérios presentes em algum pet cadastrado"));
 
     }
+    private static boolean isValidInt(String str) {
+        if (str == null){
+            return false;
+        }
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+        return false;
+        }
+    }
+
+    private static boolean isValidDouble(String str) {
+        if (str == null) {
+            return false;
+        }
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public Pet findByCriter(String arg){
         return pets.stream()
                 .filter(pet -> pet.getAddress().equals(arg)
                         || pet.getName().contains(arg)
-                        || pet.getAge() == Integer.parseInt(arg)
-                        || pet.getWeight() == Double.parseDouble(arg)
+                        || (isValidInt(arg) && pet.getAge() == Integer.parseInt(arg))
+                        || (isValidDouble(arg) && pet.getWeight() == Double.parseDouble(arg))
                         || pet.getRace().equals(arg)
                         || pet.getSex().name().equals(arg.toUpperCase().trim()))
                 .findFirst()

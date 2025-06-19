@@ -18,6 +18,7 @@ import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
+        //TODO tratamento de erros
         Scanner input = new Scanner(System.in);
         RegisterInfos registerInfos = new RegisterInfos();
         Pets pets = new Pets();
@@ -47,7 +48,7 @@ public class Program {
                     }
                     case UPDATE ->{
                         var pet = wichPet(pets);
-                        pets.Update(pet);
+                        System.out.println("Pet atualizado: \n" + pets.Update(pet));
                     }
                     case DELETE -> {
                         var pet = wichDelete(pets);
@@ -129,12 +130,12 @@ public class Program {
             br.readLine();
             System.out.println("Digite o nome do pet que deseja atualizar");
             var name = sc.nextLine();
-            System.out.println("Digite as novas informações:");
             if (name.split(" ").length < 2) {
                 throw new MenuExceptions("Por favor, cadastre nome e sobrenome");
             } else if (!name.matches("[a-zA-Z ]+")) {
                 throw new MenuExceptions("Por favor, sem caracteres especiais");
             }
+            System.out.println("Digite as novas informações:");
             System.out.println(br.readLine());
             var type = Type.valueOf(sc.nextLine().toUpperCase().trim());
             System.out.println(br.readLine());
