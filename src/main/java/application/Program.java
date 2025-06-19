@@ -6,7 +6,6 @@ import entities.Pets;
 import enums.MenuOptions;
 import enums.Sex;
 import enums.Type;
-import utils.RegisterInfos;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -20,7 +19,6 @@ public class Program {
     public static void main(String[] args) {
         //TODO tratamento de erros
         Scanner input = new Scanner(System.in);
-        RegisterInfos registerInfos = new RegisterInfos();
         Pets pets = new Pets();
         boolean exit = false;
         while (!exit) {
@@ -36,10 +34,10 @@ public class Program {
                 );
                 String response = input.nextLine();
                 int responseint = Integer.parseInt(response);
-                var Option = MenuOptions.values()[responseint-1];
                 if (responseint < 1 || responseint > 6 || !response.matches("^[0-9]+$")) {
                     throw new MenuExceptions("Favor informe um valor válido\n");
                 }
+                var Option = MenuOptions.values()[responseint-1];
                 switch (Option) {
                     case REGISTER -> {
                        var pet = Pets.RegisterPet();
