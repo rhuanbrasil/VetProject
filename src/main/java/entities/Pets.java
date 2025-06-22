@@ -1,6 +1,6 @@
 package entities;
 
-import Exceptions.MenuExceptions;
+import exceptions.MenuExceptions;
 import enums.Sex;
 import enums.Type;
 
@@ -29,9 +29,21 @@ public class Pets {
                 throw new MenuExceptions("Por favor, sem caracteres especiais");
             }
             System.out.println(br.readLine());
-            var type = Type.valueOf(sc.nextLine().toUpperCase().trim());
+            var tipo = sc.nextLine().toUpperCase().trim();
+            Type type;
+            if (tipo.equals("CACHORRO") || tipo.equals("GATO")) {
+                type = Type.valueOf(tipo);
+            } else {
+                throw new MenuExceptions("Por favor, digite um tipo de animal disponível(Cachorro ou gato)");
+            }
             System.out.println(br.readLine());
-            var sex = Sex.valueOf(sc.nextLine().toUpperCase().trim());
+            var sexV = sc.nextLine().toUpperCase().trim();
+            Sex sex;
+            if (sexV.equals("MACHO") || sexV.equals("FEMEA")) {
+                 sex = Sex.valueOf(sexV);
+            } else {
+                throw new MenuExceptions("Favor, informe apenas se é macho ou femea");
+            }
             System.out.println(br.readLine());
             var address = sc.nextLine();
             System.out.println(br.readLine());
@@ -54,8 +66,9 @@ public class Pets {
             throw new RuntimeException(e);
         }
     }
-    public Pet findByCriters(String arg, String arg2){
+    public Pet findByCriters(String arg0, String arg, String arg2){
         return pets.stream()
+                .filter(p -> arg0 != null && p.getType().name().equals(arg0.toUpperCase().trim()))
                 .filter(pet -> {
                     boolean matchesArg =
                             pet.getAddress().equals(arg) ||
@@ -67,6 +80,7 @@ public class Pets {
                     boolean matchesArg2 =
                             pet.getAddress().equals(arg2) ||
                             pet.getName().contains(arg2) ||
+                            pet.getSex().name().equals(arg2.toUpperCase().trim()) ||
                             (isValidInt(arg2) && pet.getAge() == Integer.parseInt(arg2)) ||
                             (isValidDouble(arg2) && pet.getWeight() == Double.parseDouble(arg2)) ||
                             pet.getRace().equals(arg2);
@@ -101,10 +115,18 @@ public class Pets {
             return false;
         }
     }
+    public Pet findByName(String name){
+       return pets.stream()
+                .filter(p -> p.getName().contains(name))
+                .findFirst()
+                .orElseThrow(() -> new MenuExceptions("Nenhum pet com esse nome foi encontrado"));
+    }
 
-    public Pet findByCriter(String arg){
+    public Pet findByCriter(String arg0, String arg){
         return pets.stream()
-                .filter(pet -> pet.getAddress().equals(arg)
+                .filter(p -> arg0 != null && p.getType().name().equals(arg0.toUpperCase().trim()))
+                .filter(pet ->
+                        pet.getAddress().equals(arg)
                         || pet.getName().contains(arg)
                         || (isValidInt(arg) && pet.getAge() == Integer.parseInt(arg))
                         || (isValidDouble(arg) && pet.getWeight() == Double.parseDouble(arg))
@@ -115,19 +137,22 @@ public class Pets {
 
     }
     public Pet Update(Pet pet){
-        var toUp = findByCriters(pet.getName(), pet.getRace());
+        var toUp = findByName(pet.getName());
         pets.remove(toUp);
         pets.add(pet);
         return pet;
     }
     public void listAll(){
-         pets.forEach(System.out::println);
+        if(!pets.isEmpty()) {
+            pets.forEach(System.out::println);
+        }else{
+             throw new MenuExceptions("Nenhum pet cadastrado!");
+            }
     }
     public void addpet(Pet pet) {
         pets.add(pet);
     }
     public void removepet(Pet pet) {
-        var toDelete = findByCriters(pet.getName(), pet.getRace());
-        pets.remove(toDelete);
+        pets.remove(pet);
     }
 }

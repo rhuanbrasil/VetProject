@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class MenuExceptions extends RuntimeException {
   public MenuExceptions(String message) {

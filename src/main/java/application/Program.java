@@ -1,6 +1,6 @@
 package application;
 
-import Exceptions.MenuExceptions;
+import exceptions.MenuExceptions;
 import entities.Pet;
 import entities.Pets;
 import enums.MenuOptions;
@@ -8,16 +8,12 @@ import enums.Sex;
 import enums.Type;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Program {
     public static void main(String[] args) {
-        //TODO tratamento de erros
         Scanner input = new Scanner(System.in);
         Pets pets = new Pets();
         boolean exit = false;
@@ -33,11 +29,11 @@ public class Program {
                   "6. Sair"
                 );
                 String response = input.nextLine();
-                int responseint = Integer.parseInt(response);
-                if (responseint < 1 || responseint > 6 || !response.matches("^[0-9]+$")) {
+                var num = isValidInt(response);
+                if (num < 1 || num > 6 || !response.matches("^[0-9]+$")) {
                     throw new MenuExceptions("Favor informe um valor válido\n");
                 }
-                var Option = MenuOptions.values()[responseint-1];
+                var Option = MenuOptions.values()[num-1];
                 switch (Option) {
                     case REGISTER -> {
                        var pet = Pets.RegisterPet();
@@ -51,18 +47,22 @@ public class Program {
                     case DELETE -> {
                         var pet = wichDelete(pets);
                         pets.removepet(pet);
+                        System.out.println("Pet deletado do cadastro");
                     }
                     case LISTALL -> {
+                        try{
                         pets.listAll();
+                    }catch(MenuExceptions e){
+                            System.out.println(e.getMessage());
+                        }
                     }
                     case FILTERLIST -> {
                         var qnt = qntCriters();
+                        var tipo = type();
                         if (qnt == 1){
-                            System.out.println(pets.findByCriter(arg()));
+                            System.out.println(pets.findByCriter(tipo, arg()));
                         } else {
-                            var a1 = arg();
-                            var a2 = arg();
-                            System.out.println(pets.findByCriters(a1, a2));
+                            System.out.println(pets.findByCriters(tipo, arg(), arg()));
                         }
                     }
                     case EXIT -> {
@@ -76,10 +76,36 @@ public class Program {
             }
         }
     }
+    private static int isValidInt(String arg){
+        if (arg == null || arg.isEmpty()){
+            return 0;
+        }
+        try{
+            return Integer.parseInt(arg);
+
+        } catch (NumberFormatException e){
+            throw new MenuExceptions("Por favor, digite apenas números");
+        }
+    }
     public static String arg(){
         var sc = new Scanner(System.in);
         System.out.println("Digite o nome ou alguma característica do seu pet:");
         return sc.nextLine();
+    }
+    public static String type(){
+        var sc = new Scanner(System.in);
+        try{
+            System.out.println("Qual o tipo do animal?(Gato ou cachorro)");
+            var tipo = sc.nextLine().toUpperCase();
+            if(tipo.equals("GATO") || tipo.equals("CACHORRO")){
+                return tipo;
+            }else{
+                throw new MenuExceptions("Favor informe um tipo de animal possíveis\n");
+            }
+        }catch(MenuExceptions e){
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
     public static int qntCriters() {
 
@@ -117,8 +143,8 @@ public class Program {
     public static Pet wichDelete(Pets pets) {
         var sc = new Scanner(System.in);
         pets.listAll();
-        System.out.println("Qual pet você deseja deletar?");
-        return pets.findByCriter(sc.nextLine());
+        System.out.println("Qual pet você deseja deletar?(Nome)");
+        return pets.findByName(sc.nextLine());
     }
     public static Pet wichPet(Pets pets){
         var sc = new Scanner(System.in);
@@ -129,7 +155,7 @@ public class Program {
             System.out.println("Digite o nome do pet que deseja atualizar");
             var name = sc.nextLine();
             if (name.split(" ").length < 2) {
-                throw new MenuExceptions("Por favor, cadastre nome e sobrenome");
+                throw new MenuExceptions("Por favor, digite nome e sobrenome");
             } else if (!name.matches("[a-zA-Z ]+")) {
                 throw new MenuExceptions("Por favor, sem caracteres especiais");
             }
